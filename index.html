@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Todo List Manager</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+    }
+    section {
+        border: 1px solid #ccc;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+    }
+    h2 {
+        margin-top: 0;
+    }
+    input, button {
+        margin: 5px 0;
+        padding: 5px;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+    table, th, td {
+        border: 1px solid #aaa;
+    }
+    th, td {
+        padding: 8px;
+        text-align: left;
+    }
+    .message {
+        color: green;
+        font-weight: bold;
+        margin-top: 5px;
+    }
+</style>
+</head>
+<body>
+
+<h1>Todo List Manager</h1>
+
+<!-- Adicionar Tarefa -->
+<section>
+    <h2>Add Task</h2>
+    <input type="text" id="taskTitle" placeholder="Enter task title">
+    <br>
+    <button onclick="addTask()">Add Task</button>
+    <div class="message" id="addMessage"></div>
+</section>
+
+<!-- Pesquisar Tarefas -->
+<section>
+    <h2>Search Tasks</h2>
+    <div>
+        <label>Search by ID:</label><br>
+        <input type="number" id="searchId" placeholder="Enter task ID">
+    </div>
+    <div>
+        <label>Search by Title (partial match):</label><br>
+        <input type="text" id="searchTitle" placeholder="Enter part of title">
+    </div>
+    <button onclick="searchTasks()">Search</button>
+    <button onclick="listFirstTen()">List First 10 Tasks</button>
+    <table id="taskTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</section>
+
+<!-- Remover Tarefa -->
+<section>
+    <h2>Remove Task</h2>
+    <input type="number" id="removeId" placeholder="Enter task ID to remove">
+    <br>
+    <button onclick="removeTask()">Remove Task</button>
+    <div class="message" id="removeMessage"></div>
+</section>
+
+<script>
+    let tasks = [];
+    let nextId = 1;
+
+    function addTask() {
+        const title = document.getElementById("taskTitle").value.trim();
+        const msg = document.getElementById("addMessage");
+        msg.textContent = "";
+        if (!title) {
+            alert("Please enter a task title.");
+            return;
+        }
+        const task = { id: nextId++, title };
+        tasks.push(task);
+        msg.textContent = `The task with ID ${task.id} was created`;
+        document.getElementById("taskTitle").value = "";
+    }
+
+    function searchTasks() {
+        const idValue = document.getElementById("searchId").value.trim();
+        const titleValue = document.getElementById("searchTitle").value.trim().toLowerCase();
+        let results = tasks;
+
+        if (idValue) {
+            results = results.filter(task => task.id === parseInt(idValue));
+        }
+        if (titleValue) {
+            results = results.filter(task => task.title.toLowerCase().includes(titleValue));
+        }
+        displayTasks(results);
+    }
+
+    function listFirstTen() {
+        const sorted = [...tasks].sort((a, b) => a.id - b.id).slice(0, 10);
+        displayTasks(sorted);
+    }
+
+    function displayTasks(taskList) {
+        const tbody = document.querySelector("#taskTable tbody");
+        tbody.innerHTML = "";
+        taskList.forEach(task => {
+            const row = document.createElement("tr");
+            row.innerHTML = `<td>${task.id}</td><td>${task.title}</td>`;
+            tbody.appendChild(row);
+        });
+    }
+
+    function removeTask() {
+        const idValue = document.getElementById("removeId").value.trim();
+        const msg = document.getElementById("removeMessage");
+        msg.textContent = "";
+        if (!idValue) {
+            alert("Please enter an ID to remove.");
+            return;
+        }
+        const id = parseInt(idValue);
+        const index = tasks.findIndex(task => task.id === id);
+        if (index >= 0) {
+            tasks.splice(index, 1);
+            msg.textContent = `Task with ID ${id} removed successfully`;
+        } else {
+            msg.textContent = `Task with ID ${id} not found`;
+        }
+        document.getElementById("removeId").value = "";
+    }
+</script>
+
+</body>
+</html>
